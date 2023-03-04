@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.DatePicker?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<BorderPane prefHeight="710.0" prefWidth="770.0" xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml/1" fx:controller="view.Gui">
+	<bottom>
+		<VBox prefHeight="95.0" prefWidth="770.0" BorderPane.alignment="CENTER">
+			<children>
+				<HBox alignment="CENTER" prefHeight="80.0" prefWidth="770.0" spacing="20.0">
+					<children>
+						<Button mnemonicParsing="false" onAction="#saveSettings" prefHeight="35.0" prefWidth="120.0" text="Save Settings">
+                     <graphic>
+                        <FontAwesomeIconView glyphName="GEARS" size="16" />
+                     </graphic></Button>
+						<Button mnemonicParsing="false" onAction="#extractData" prefHeight="35.0" prefWidth="120.0" text="Extract Data">
+                     <graphic>
+                        <FontAwesomeIconView glyphName="DOWNLOAD" size="16" />
+                     </graphic></Button>
+                  <Button mnemonicParsing="false" onAction="#exportData" prefHeight="35.0" prefWidth="120.0" text="Export Data">
+                     <graphic>
+                        <FontAwesomeIconView glyphName="FLOPPY_ALT" size="16" />
+                     </graphic></Button>
+					</children>
+				</HBox>
+				<TextField fx:id="statusTextField" editable="false" prefHeight="25.0" prefWidth="755.0" />
+			</children>
+		</VBox>
+	</bottom>
+	<center>
+		<VBox prefHeight="528.0" prefWidth="770.0" BorderPane.alignment="CENTER">
+			<children>
+				<HBox alignment="CENTER" prefHeight="32.0" spacing="10.0">
+					<children>
+						<Label alignment="CENTER_RIGHT" text="FoxESS Endpoint:" />
+						<TextField fx:id="endpointTextField" prefWidth="250.0" />
+						<Label alignment="CENTER_RIGHT" text="Export File:">
+							<HBox.margin>
+								<Insets left="10.0" />
+							</HBox.margin>
+						</Label>
+						<HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0">
+							<children>
+								<TextField fx:id="exportFileTextField" editable="false" prefHeight="25.0" prefWidth="241.0" />
+								<Button mnemonicParsing="false" prefHeight="25.0" prefWidth="25.0">
+									<graphic>
+										<FontAwesomeIconView glyphName="FOLDER_OPEN" onMouseClicked="#selectExportFile" />
+									</graphic>
+								</Button>
+							</children>
+						</HBox>
+						<CheckBox fx:id="appendCheckBox" mnemonicParsing="false" onAction="#appendSelection" text="Append" />
+					</children>
+				</HBox>
+				<HBox alignment="CENTER" prefHeight="32.0" spacing="10.0">
+					<children>
+						<Label alignment="CENTER_RIGHT" text="Username:" />
+						<TextField fx:id="usernameTextField" prefWidth="120.0" />
+						<Label alignment="CENTER_RIGHT" text="Password:">
+							<padding>
+								<Insets left="10.0" />
+							</padding>
+						</Label>
+						<PasswordField fx:id="passwordTextField" prefWidth="120.0" />
+						<Label alignment="CENTER_RIGHT" text="Device ID:">
+							<padding>
+								<Insets left="10.0" />
+							</padding>
+						</Label>
+						<TextField fx:id="devideIdTextField" prefWidth="250.0" />
+					</children>
+					<opaqueInsets>
+						<Insets />
+					</opaqueInsets>
+				</HBox>
+				<HBox alignment="CENTER" prefHeight="32.0" spacing="10.0">
+					<children>
+						<Label alignment="CENTER_RIGHT" text="Date:" />
+						<DatePicker fx:id="datePicker" onAction="#setDateAndHour" prefHeight="25.0" prefWidth="108.0" />
+						<Label alignment="CENTER_RIGHT" text="Hour:">
+							<padding>
+								<Insets left="10.0" />
+							</padding>
+						</Label>
+						<ComboBox fx:id="hourComboBox" onAction="#setDateAndHour" prefHeight="25.0" prefWidth="55.0" />
+						<Label alignment="CENTER_RIGHT" text="Time span:">
+							<padding>
+								<Insets left="10.0" />
+							</padding>
+						</Label>
+						<ComboBox fx:id="timeSpanComboBox" onAction="#setTimeSpan" prefHeight="25.0" prefWidth="78.0" />
+					</children>
+				</HBox>
+				<TabPane tabClosingPolicy="UNAVAILABLE">
+					<VBox.margin>
+						<Insets left="5.0" right="5.0" top="5.0" />
+					</VBox.margin>
+					<tabs>
+						<Tab text="Monitor">
+							<content>
+							</content>
+                     <content>
+                        <TableView fx:id="monitorTableView" />
+                     </content>
+                     <graphic>
+                        <FontAwesomeIconView glyphName="DESKTOP" size="14" />
+                     </graphic>
+						</Tab>
+
+						<Tab text="Variables">
+							<content>
+								<GridPane fx:id="variablesGridPane" prefHeight="373.0" prefWidth="800.0">
+									<columnConstraints>
+										<ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+										<ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+										<ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+										<ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+										<ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+									</columnConstraints>
+									<rowConstraints>
+										<RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+										<RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+										<RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+										<RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+										<RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+										<RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+										<RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+										<RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+										<RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+										<RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+										<RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+										<RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+										<RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+										<RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+									</rowConstraints>
+									<padding>
+										<Insets top="5.0" />
+									</padding>
+								</GridPane>
+							</content>
+                     <graphic>
+                        <FontAwesomeIconView glyphName="SLIDERS" size="14" />
+                     </graphic>
+						</Tab>
+					</tabs>
+				</TabPane>
+			</children>
+		</VBox>
+	</center>
+	<top>
+		<VBox alignment="CENTER" prefHeight="90.0" prefWidth="770.0" BorderPane.alignment="CENTER">
+         <children>
+            <ImageView fitHeight="76.0" fitWidth="303.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@logo.png" />
+               </image>
+               <VBox.margin>
+                  <Insets top="5.0" />
+               </VBox.margin>
+            </ImageView>
+            <Label text="by Alessio Lombardo - Version 1.0" textFill="#004071">
+               <padding>
+                  <Insets bottom="5.0" right="5.0" />
+               </padding>
+               <font>
+                  <Font name="System Bold Italic" size="12.0" />
+               </font>
+            </Label>
+         </children></VBox>
+	</top>
+</BorderPane>
