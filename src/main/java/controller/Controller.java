@@ -12,9 +12,7 @@ import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.X509Certificate;
 import java.text.DecimalFormatSymbols;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
+import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Map;
@@ -123,12 +121,18 @@ public class Controller extends Application {
 			sslTrustInit();
 
 			String token = login();
+			if (token.isEmpty()) {
+				return;
+			}
 
 			ResponseData responseData = requestRawData(token);
 
 			conn.disconnect();
 
-			Map<LocalDateTime, ArrayList<String>> dataMap = elaborateResponse(responseData);
+			Map<OffsetDateTime, ArrayList<String>> dataMap = elaborateResponse(responseData);
+			if (dataMap == null) {
+				return;
+			}
 
 			gui.updateMonitowRecord(dataMap);
 
@@ -217,7 +221,7 @@ public class Controller extends Application {
 
 	}
 
-	public Map<LocalDateTime, ArrayList<String>> elaborateResponse(ResponseData responseData) {
+	public Map<OffsetDateTime, ArrayList<String>> elaborateResponse(ResponseData responseData) {
 
 		if (responseData.getErrno() == 40261) {
 			gui.setStatus(null, "Error " + responseData.getErrno() + ": Invalid Device ID", true);
@@ -231,16 +235,13 @@ public class Controller extends Application {
 			return null;
 		}
 
-		Map<LocalDateTime, ArrayList<String>> dataMap = new TreeMap<LocalDateTime, ArrayList<String>>();
+		Map<OffsetDateTime, ArrayList<String>> dataMap = new TreeMap<OffsetDateTime, ArrayList<String>>();
 		for (ResponseData.Result result : responseData.getResult()) {
 			for (ResponseData.Result.Data data : result.getData()) {
-				LocalDate localDate = LocalDate.parse(data.getTime().subSequence(0, 10),
-						DateTimeFormatter.ISO_LOCAL_DATE);
-				LocalTime localTime = LocalTime.parse(data.getTime().substring(11, 19),
-						DateTimeFormatter.ISO_LOCAL_TIME);
-				LocalDateTime localDateTime = LocalDateTime.of(localDate, localTime);
-				dataMap.putIfAbsent(localDateTime, new ArrayList<String>());
-				dataMap.get(localDateTime).add(data.getValue());
+				OffsetDateTime offsetDatetime = OffsetDateTime.parse(data.getTime(),
+						DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss zZ"));
+				dataMap.putIfAbsent(offsetDatetime, new ArrayList<String>());
+				dataMap.get(offsetDatetime).add(data.getValue());
 			}
 		}
 
@@ -250,7 +251,7 @@ public class Controller extends Application {
 
 	}
 
-	private void exportData(Map<LocalDateTime, ArrayList<String>> dataMap) {
+	private void exportData(Map<OffsetDateTime, ArrayList<String>> dataMap) {
 
 		try {
 
@@ -277,7 +278,7 @@ public class Controller extends Application {
 				fileWriter.write(header.toString() + "\n");
 				fileWriter.flush();
 			}
-			for (Map.Entry<LocalDateTime, ArrayList<String>> entry : dataMap.entrySet()) {
+			for (Map.Entry<OffsetDateTime, ArrayList<String>> entry : dataMap.entrySet()) {
 				fileWriter.write(entry.getKey().format(DateTimeFormatter.ofPattern(settings.getDateTimeFormat())));
 				for (String variable : entry.getValue()) {
 					fileWriter.write(

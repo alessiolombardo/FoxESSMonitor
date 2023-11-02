@@ -4,6 +4,7 @@ import java.io.File;
 import java.security.NoSuchAlgorithmException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -202,11 +203,11 @@ public class Gui {
 
 	}
 
-	public void updateMonitowRecord(Map<LocalDateTime, ArrayList<String>> dataMap) {
+	public void updateMonitowRecord(Map<OffsetDateTime, ArrayList<String>> dataMap) {
 
 		monitorTableView.getItems().clear();
 
-		for (Map.Entry<LocalDateTime, ArrayList<String>> entry : dataMap.entrySet()) {
+		for (Map.Entry<OffsetDateTime, ArrayList<String>> entry : dataMap.entrySet()) {
 			ArrayList<String> record = new ArrayList<String>();
 			record.add(entry.getKey().toString());
 			for (String variables : entry.getValue()) {
