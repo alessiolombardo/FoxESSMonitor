@@ -177,7 +177,7 @@
                   <Insets top="5.0" />
                </VBox.margin>
             </ImageView>
-            <Label text="by Alessio Lombardo - Version 1.0" textFill="#004071">
+            <Label text="by Alessio Lombardo - Version 1.1" textFill="#004071">
                <padding>
                   <Insets bottom="5.0" right="5.0" />
                </padding>
