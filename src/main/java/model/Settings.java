@@ -1,41 +1,38 @@
 package model;
 
-import java.math.BigInteger;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 import java.util.EnumMap;
 
 public class Settings {
 
-	private String endpoint = "https://www.foxesscloud.com/c/v0";
+	private transient String endpoint = "https://www.foxesscloud.com";
 
-	private transient String urnLogin = "/user/login";
+	private transient String urnReportQuery = "/op/v0/device/history/query";
 
-	private transient String urnRawData = "/device/history/raw";
+	private String apiKey = "";
 
-	private String username = "";
-
-	private transient String password = "";
-
-	private String md5Password = "";
-
-	private String deviceId = "";
+	private String inverterSerialNumber = "";
 
 	private String exportFilename = "FoxESSData.csv";
 
 	private Boolean append = true;
 
-	private FoxEssTimeSpan timeSpan = FoxEssTimeSpan.hour;
+	private transient LocalDateTime beginDate;
 
-	private transient LocalDateTime date = LocalDateTime.now();
+	private transient LocalDateTime endDate;
+
+	private transient byte spanHour;
 
 	private String dateTimeFormat = "dd/MM/yyyy HH:mm";
 
 	private EnumMap<FoxEssVariables, Boolean> variables = new EnumMap<>(FoxEssVariables.class);
 
 	public Settings() {
+		setSpanHour((byte) 1);
+		setBeginDate(LocalDateTime.now());
+		setEndDate();
 		for (FoxEssVariables v : Arrays.asList(FoxEssVariables.values())) {
 			variables.put(v, false);
 		}
@@ -49,44 +46,28 @@ public class Settings {
 		this.endpoint = endpoint;
 	}
 
-	public String getUrnLogin() {
-		return urnLogin;
+	public String getUrnReportQuery() {
+		return urnReportQuery;
 	}
 
-	public String getUrnRawData() {
-		return urnRawData;
+	public void setUrnReportQuery(String urnReportQuery) {
+		this.urnReportQuery = urnReportQuery;
 	}
 
-	public String getUsername() {
-		return username;
+	public String getApiKey() {
+		return apiKey;
 	}
 
-	public void setUsername(String username) {
-		this.username = username;
+	public void setApiKey(String apiKey) {
+		this.apiKey = apiKey;
 	}
 
-	public void setPassword(String password) throws NoSuchAlgorithmException {
-		this.password = password;
-		if (!password.isEmpty()) {
-			this.md5Password = new BigInteger(1, MessageDigest.getInstance("MD5").digest(password.getBytes()))
-					.toString(16);
-		}
+	public String getInverterSerialNumber() {
+		return inverterSerialNumber;
 	}
 
-	public String getMd5Password() {
-		return md5Password;
-	}
-
-	public void setMd5Password(String md5Password) {
-		this.md5Password = md5Password;
-	}
-
-	public String getDeviceId() {
-		return deviceId;
-	}
-
-	public void setDeviceId(String deviceId) {
-		this.deviceId = deviceId;
+	public void setInverterSerialNumber(String inverterSerialNumber) {
+		this.inverterSerialNumber = inverterSerialNumber;
 	}
 
 	public String getExportFilename() {
@@ -105,20 +86,28 @@ public class Settings {
 		this.append = append;
 	}
 
-	public FoxEssTimeSpan getTimeSpan() {
-		return timeSpan;
+	public LocalDateTime getBeginDate() {
+		return beginDate;
 	}
 
-	public void setTimeSpan(FoxEssTimeSpan timeSpan) {
-		this.timeSpan = timeSpan;
+	public void setBeginDate(LocalDateTime beginDate) {
+		this.beginDate = beginDate.truncatedTo(ChronoUnit.HOURS);
 	}
 
-	public LocalDateTime getDate() {
-		return date;
+	public LocalDateTime getEndDate() {
+		return endDate;
 	}
 
-	public void setDate(LocalDateTime date) {
-		this.date = date;
+	public void setEndDate() {
+		this.endDate = beginDate.plusHours(getSpanHour());
+	}
+
+	public byte getSpanHour() {
+		return spanHour;
+	}
+
+	public void setSpanHour(byte spanHour) {
+		this.spanHour = spanHour;
 	}
 
 	public String getDateTimeFormat() {
@@ -135,10 +124,10 @@ public class Settings {
 
 	@Override
 	public String toString() {
-		return "Settings [endpoint=" + endpoint + ", urnLogin=" + urnLogin + ", urnRawData=" + urnRawData
-				+ ", username=" + username + ", password=" + password + ", md5Password=" + md5Password + ", deviceId="
-				+ deviceId + ", exportFilename=" + exportFilename + ", append=" + append + ", timeSpan=" + timeSpan
-				+ ", date=" + date + ", variables=" + variables + "]";
+		return "Settings [endpoint=" + endpoint + ", urnReportQuery=" + urnReportQuery + ", apiKey=" + apiKey
+				+ ", inverterSerialNumber=" + inverterSerialNumber + ", exportFilename=" + exportFilename + ", append="
+				+ append + ", beginDate=" + beginDate + ", endDate=" + endDate + ", dateTimeFormat=" + dateTimeFormat
+				+ ", variables=" + variables + "]";
 	}
 
 }

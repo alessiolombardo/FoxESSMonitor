@@ -5,65 +5,20 @@ import java.util.List;
 
 public class RequestData {
 
-	public class DateTime {
-		private String year;
-		private String month;
-		private String day;
-		private String hour;
-
-		public String getYear() {
-			return year;
-		}
-
-		public void setYear(String year) {
-			this.year = year;
-		}
-
-		public String getMonth() {
-			return month;
-		}
-
-		public void setMonth(String month) {
-			this.month = month;
-		}
-
-		public String getDay() {
-			return day;
-		}
-
-		public void setDay(String day) {
-			this.day = day;
-		}
-
-		public String getHour() {
-			return hour;
-		}
-
-		public void setHour(String hour) {
-			this.hour = hour;
-		}
-
-		@Override
-		public String toString() {
-			return "DateTime [year=" + year + ", month=" + month + ", day=" + day + ", hour=" + hour + "]";
-		}
-
-	}
-
-	private String deviceId;
+	private String sn;
 
 	private List<FoxEssVariables> variables = new ArrayList<FoxEssVariables>();
 
-	private String timespan;
+	private long begin;
 
-	private DateTime beginDate = new DateTime();
+	private long end;
 
-	public String getDeviceId() {
-		return deviceId;
+	public String sn() {
+		return sn;
 	}
 
-	public void setDeviceId(String deviceId) {
-		this.deviceId = deviceId;
+	public void setSn(String sn) {
+		this.sn = sn;
 	}
 
 	public List<FoxEssVariables> getVariables() {
@@ -74,26 +29,25 @@ public class RequestData {
 		this.variables = variables;
 	}
 
-	public String getTimespan() {
-		return timespan;
+	public long getBegin() {
+		return begin;
 	}
 
-	public void setTimespan(String timespan) {
-		this.timespan = timespan;
+	public void setBegin(long begin) {
+		this.begin = begin;
 	}
 
-	public DateTime getBeginDate() {
-		return beginDate;
+	public long getEnd() {
+		return end;
 	}
 
-	public void setBeginDate(DateTime beginDate) {
-		this.beginDate = beginDate;
+	public void setEnd(long end) {
+		this.end = end;
 	}
 
 	@Override
 	public String toString() {
-		return "RequestData [deviceId=" + deviceId + ", variables=" + variables + ", timespan=" + timespan
-				+ ", beginDate=" + beginDate + "]";
+		return "RequestData [sn=" + sn + ", variables=" + variables + ", begin=" + begin + ", end=" + end + "]";
 	}
 
 }

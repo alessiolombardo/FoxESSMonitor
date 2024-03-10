@@ -2,6 +2,7 @@
 .settings/
 .project
 .classpath
+settings.json
 dependency-reduced-pom.xml
 target/
 MISC/

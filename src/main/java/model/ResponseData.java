@@ -7,83 +7,114 @@ public class ResponseData {
 
 	public class Result {
 
-		public class Data {
+		public class Datas {
 
-			private String time;
+			public class Data {
 
-			private String value;
+				private String time;
 
-			public String getTime() {
-				return time;
+				private String value;
+
+				public String getTime() {
+					return time;
+				}
+
+				public void setTime(String time) {
+					this.time = time;
+				}
+
+				public String getValue() {
+					return value;
+				}
+
+				public void setValue(String value) {
+					this.value = value;
+				}
+
+				@Override
+				public String toString() {
+					return "Data [time=" + time + ", value=" + value + "]";
+				}
+
 			}
 
-			public void setTime(String time) {
-				this.time = time;
+			private FoxEssVariables variable;
+
+			private String unit;
+
+			private String name;
+
+			private List<Data> data = new ArrayList<Data>();
+
+			public FoxEssVariables getVariable() {
+				return variable;
 			}
 
-			public String getValue() {
-				return value;
+			public void setVariable(FoxEssVariables variable) {
+				this.variable = variable;
 			}
 
-			public void setValue(String value) {
-				this.value = value;
+			public String getUnit() {
+				return unit;
+			}
+
+			public void setUnit(String unit) {
+				this.unit = unit;
+			}
+
+			public String getName() {
+				return name;
+			}
+
+			public void setName(String name) {
+				this.name = name;
+			}
+
+			public List<Data> getData() {
+				return data;
+			}
+
+			public void setData(List<Data> data) {
+				this.data = data;
 			}
 
 			@Override
 			public String toString() {
-				return "Data [time=" + time + ", value=" + value + "]";
+				return "Datas [variable=" + variable + ", unit=" + unit + ", name=" + name + ", data=" + data + "]";
 			}
 
 		}
 
-		private FoxEssVariables variable;
+		private List<Datas> datas = new ArrayList<Datas>();
 
-		private String unit;
+		private String deviceSN;
 
-		private String name;
-
-		private List<Data> data = new ArrayList<Data>();
-
-		public FoxEssVariables getVariable() {
-			return variable;
+		public List<Datas> getDatas() {
+			return datas;
 		}
 
-		public void setVariable(FoxEssVariables variable) {
-			this.variable = variable;
+		public void setDatas(List<Datas> datas) {
+			this.datas = datas;
 		}
 
-		public String getUnit() {
-			return unit;
+		public String getDeviceSN() {
+			return deviceSN;
 		}
 
-		public void setUnit(String unit) {
-			this.unit = unit;
-		}
-
-		public String getName() {
-			return name;
-		}
-
-		public void setName(String name) {
-			this.name = name;
-		}
-
-		public List<Data> getData() {
-			return data;
-		}
-
-		public void setData(List<Data> data) {
-			this.data = data;
+		public void setDeviceSN(String deviceSN) {
+			this.deviceSN = deviceSN;
 		}
 
 		@Override
 		public String toString() {
-			return "Result [variable=" + variable + ", unit=" + unit + ", name=" + name + ", data=" + data + "]";
+			return "Result [datas=" + datas + ", deviceSN=" + deviceSN + "]";
 		}
 
 	}
 
 	private int errno;
+
+	private String msg;
 
 	private List<Result> result = new ArrayList<Result>();
 
@@ -93,6 +124,14 @@ public class ResponseData {
 
 	public void setErrno(int errno) {
 		this.errno = errno;
+	}
+
+	public String getMsg() {
+		return msg;
+	}
+
+	public void setMsg(String msg) {
+		this.msg = msg;
 	}
 
 	public List<Result> getResult() {
@@ -105,7 +144,7 @@ public class ResponseData {
 
 	@Override
 	public String toString() {
-		return "ResponseData [errno=" + errno + ", result=" + result + "]";
+		return "ResponseData [errno=" + errno + ", msg=" + msg + ", result=" + result + "]";
 	}
 
 }

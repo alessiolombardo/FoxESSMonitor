@@ -7,11 +7,14 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.math.BigInteger;
 import java.net.URL;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.X509Certificate;
+import java.security.MessageDigest;
 import java.text.DecimalFormatSymbols;
+import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -38,7 +41,6 @@ import javafx.stage.Stage;
 import model.FoxEssVariables;
 import model.RequestData;
 import model.ResponseData;
-import model.ResponseToken;
 import model.Settings;
 import view.Gui;
 
@@ -116,16 +118,12 @@ public class Controller extends Application {
 	}
 
 	public void extractData(Boolean export) {
+
 		try {
 
 			sslTrustInit();
 
-			String token = login();
-			if (token.isEmpty()) {
-				return;
-			}
-
-			ResponseData responseData = requestRawData(token);
+			ResponseData responseData = requestRawData();
 
 			conn.disconnect();
 
@@ -165,52 +163,32 @@ public class Controller extends Application {
 		HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
 	}
 
-	private String login() throws IOException {
+	private ResponseData requestRawData() throws IOException, NoSuchAlgorithmException {
 
-		conn = (HttpsURLConnection) new URL(settings.getEndpoint() + settings.getUrnLogin()).openConnection();
+		conn = (HttpsURLConnection) new URL(settings.getEndpoint() + settings.getUrnReportQuery()).openConnection();
 		conn.setDoOutput(true);
 
-		String input = "user=" + settings.getUsername() + "&password=" + settings.getMd5Password();
-		conn.getOutputStream().write(input.getBytes());
+		String timestamp = "" + Instant.now().toEpochMilli();
+		String signatureTemp = settings.getUrnReportQuery() + "\\r\\n" + settings.getApiKey() + "\\r\\n" + timestamp;
+		String signature = new BigInteger(1, MessageDigest.getInstance("MD5").digest(signatureTemp.getBytes()))
+				.toString(16);
 
-		String output = new BufferedReader(new InputStreamReader((conn.getInputStream()))).readLine();
-		ResponseToken responseToken = new Gson().fromJson(output, ResponseToken.class);
-
-		if (responseToken.getErrno() == 0) {
-			return responseToken.getResult().getToken();
-		} else if (responseToken.getErrno() == 41807) {
-			gui.setStatus(null, "Error " + responseToken.getErrno() + ": Bad username or password", true);
-		} else if (responseToken.getErrno() == 40401) {
-			gui.setStatus(null, "Error " + responseToken.getErrno() + ": Too many requests", true);
-		} else {
-			gui.setStatus(null, "Error " + responseToken.getErrno(), true);
-		}
-		return "";
-
-	}
-
-	private ResponseData requestRawData(String token) throws IOException {
-
-		if (token.isEmpty()) {
-			return new ResponseData();
-		}
-
-		conn = (HttpsURLConnection) new URL(settings.getEndpoint() + settings.getUrnRawData()).openConnection();
-		conn.setDoOutput(true);
-		conn.setRequestProperty("token", token);
+		conn.setRequestProperty("Content-Type", "application/json");
+		conn.setRequestProperty("token", settings.getApiKey());
+		conn.setRequestProperty("signature", signature);
+		conn.setRequestProperty("timestamp", timestamp);
+		conn.setRequestProperty("lang", "en");
 
 		RequestData d = new RequestData();
-		d.setDeviceId(settings.getDeviceId());
+		d.setSn(settings.getInverterSerialNumber());
 		for (Map.Entry<FoxEssVariables, Boolean> entry : settings.getVariables().entrySet()) {
 			if (entry.getValue().equals(true)) {
 				d.getVariables().add(entry.getKey());
 			}
 		}
-		d.setTimespan(settings.getTimeSpan().name());
-		d.getBeginDate().setYear("" + settings.getDate().getYear());
-		d.getBeginDate().setMonth("" + settings.getDate().getMonthValue());
-		d.getBeginDate().setDay("" + settings.getDate().getDayOfMonth());
-		d.getBeginDate().setHour("" + settings.getDate().getHour());
+
+		d.setBegin(settings.getBeginDate().toEpochSecond(OffsetDateTime.now().getOffset()) * 1000);
+		d.setEnd(settings.getEndDate().toEpochSecond(OffsetDateTime.now().getOffset()) * 1000);
 
 		conn.getOutputStream().write(new Gson().toJson(d).getBytes());
 
@@ -223,10 +201,17 @@ public class Controller extends Application {
 
 	public Map<OffsetDateTime, ArrayList<String>> elaborateResponse(ResponseData responseData) {
 
-		if (responseData.getErrno() == 40261) {
-			gui.setStatus(null, "Error " + responseData.getErrno() + ": Invalid Device ID", true);
-		} else if (responseData.getErrno() == 41929) {
-			gui.setStatus(null, "Error " + responseData.getErrno() + ": Device ID not exist", true);
+		if (responseData.getErrno() == 40256) {
+			gui.setStatus(null, "Error " + responseData.getErrno()
+					+ ": The request header parameters are missing. Please check whether the request headers are consistent with the document requirements.",
+					true);
+		} else if (responseData.getErrno() == 40257) {
+			gui.setStatus(null, "Error " + responseData.getErrno()
+					+ ": The request body parameters are invalid. Please check whether the request body is consistent with the document requirements.",
+					true);
+		} else if (responseData.getErrno() == 40400) {
+			gui.setStatus(null, "Error " + responseData.getErrno()
+					+ ": The number of requests is too frequent. Please reduce the frequency of access.", true);
 		} else if (responseData.getErrno() > 0) {
 			gui.setStatus(null, "Error " + responseData.getErrno(), true);
 		}
@@ -236,8 +221,8 @@ public class Controller extends Application {
 		}
 
 		Map<OffsetDateTime, ArrayList<String>> dataMap = new TreeMap<OffsetDateTime, ArrayList<String>>();
-		for (ResponseData.Result result : responseData.getResult()) {
-			for (ResponseData.Result.Data data : result.getData()) {
+		for (ResponseData.Result.Datas datas : responseData.getResult().get(0).getDatas()) {
+			for (ResponseData.Result.Datas.Data data : datas.getData()) {
 				OffsetDateTime offsetDatetime = OffsetDateTime.parse(data.getTime(),
 						DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss zZ"));
 				dataMap.putIfAbsent(offsetDatetime, new ArrayList<String>());

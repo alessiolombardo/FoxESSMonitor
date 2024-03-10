@@ -7,7 +7,6 @@
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.DatePicker?>
 <?import javafx.scene.control.Label?>
-<?import javafx.scene.control.PasswordField?>
 <?import javafx.scene.control.Tab?>
 <?import javafx.scene.control.TabPane?>
 <?import javafx.scene.control.TableView?>
@@ -22,7 +21,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane prefHeight="710.0" prefWidth="770.0" xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml/1" fx:controller="view.Gui">
+<BorderPane prefHeight="710.0" prefWidth="890.0" xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml/1" fx:controller="view.Gui">
 	<bottom>
 		<VBox prefHeight="95.0" prefWidth="770.0" BorderPane.alignment="CENTER">
 			<children>
@@ -51,8 +50,14 @@
 			<children>
 				<HBox alignment="CENTER" prefHeight="32.0" spacing="10.0">
 					<children>
-						<Label alignment="CENTER_RIGHT" text="FoxESS Endpoint:" />
-						<TextField fx:id="endpointTextField" prefWidth="250.0" />
+						<Label alignment="CENTER_RIGHT" text="API Key:" />
+						<TextField fx:id="apiKeyTextField" alignment="CENTER_RIGHT" prefHeight="25.0" prefWidth="244.0" />
+						<Label alignment="CENTER_RIGHT" text="Inverter SN:">
+							<padding>
+								<Insets left="10.0" />
+							</padding>
+						</Label>
+						<TextField fx:id="inverterSNTextField" alignment="CENTER_RIGHT" prefHeight="25.0" prefWidth="127.0" />
 						<Label alignment="CENTER_RIGHT" text="Export File:">
 							<HBox.margin>
 								<Insets left="10.0" />
@@ -60,7 +65,7 @@
 						</Label>
 						<HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0">
 							<children>
-								<TextField fx:id="exportFileTextField" editable="false" prefHeight="25.0" prefWidth="241.0" />
+								<TextField fx:id="exportFileTextField" alignment="CENTER_RIGHT" editable="false" prefHeight="25.0" prefWidth="241.0" />
 								<Button mnemonicParsing="false" prefHeight="25.0" prefWidth="25.0">
 									<graphic>
 										<FontAwesomeIconView glyphName="FOLDER_OPEN" onMouseClicked="#selectExportFile" />
@@ -73,41 +78,20 @@
 				</HBox>
 				<HBox alignment="CENTER" prefHeight="32.0" spacing="10.0">
 					<children>
-						<Label alignment="CENTER_RIGHT" text="Username:" />
-						<TextField fx:id="usernameTextField" prefWidth="120.0" />
-						<Label alignment="CENTER_RIGHT" text="Password:">
+						<Label alignment="CENTER_RIGHT" prefWidth="80.0" text="Begin Date:" />
+						<DatePicker fx:id="beginDatePicker" onAction="#setBeginDateAndHour" prefHeight="25.0" prefWidth="108.0" />
+						<Label alignment="CENTER_RIGHT" prefWidth="80.0" text="Begin Hour:">
 							<padding>
 								<Insets left="10.0" />
 							</padding>
 						</Label>
-						<PasswordField fx:id="passwordTextField" prefWidth="120.0" />
-						<Label alignment="CENTER_RIGHT" text="Device ID:">
-							<padding>
-								<Insets left="10.0" />
-							</padding>
-						</Label>
-						<TextField fx:id="devideIdTextField" prefWidth="250.0" />
-					</children>
-					<opaqueInsets>
-						<Insets />
-					</opaqueInsets>
-				</HBox>
-				<HBox alignment="CENTER" prefHeight="32.0" spacing="10.0">
-					<children>
-						<Label alignment="CENTER_RIGHT" text="Date:" />
-						<DatePicker fx:id="datePicker" onAction="#setDateAndHour" prefHeight="25.0" prefWidth="108.0" />
-						<Label alignment="CENTER_RIGHT" text="Hour:">
-							<padding>
-								<Insets left="10.0" />
-							</padding>
-						</Label>
-						<ComboBox fx:id="hourComboBox" onAction="#setDateAndHour" prefHeight="25.0" prefWidth="55.0" />
-						<Label alignment="CENTER_RIGHT" text="Time span:">
-							<padding>
-								<Insets left="10.0" />
-							</padding>
-						</Label>
-						<ComboBox fx:id="timeSpanComboBox" onAction="#setTimeSpan" prefHeight="25.0" prefWidth="78.0" />
+						<ComboBox fx:id="beginHourComboBox" onAction="#setBeginDateAndHour" prefHeight="25.0" prefWidth="55.0" />
+                  <Label alignment="CENTER_RIGHT" prefWidth="80.0" text="Span (Hour):">
+                     <padding>
+                        <Insets left="10.0" />
+                     </padding>
+                  </Label>
+                  <ComboBox fx:id="spanHourComboBox" onAction="#setSpanHour" prefHeight="25.0" prefWidth="55.0" />
 					</children>
 				</HBox>
 				<TabPane tabClosingPolicy="UNAVAILABLE">
@@ -177,7 +161,7 @@
                   <Insets top="5.0" />
                </VBox.margin>
             </ImageView>
-            <Label text="by Alessio Lombardo - Version 1.1" textFill="#004071">
+            <Label text="by Alessio Lombardo - Version 2.0" textFill="#004071">
                <padding>
                   <Insets bottom="5.0" right="5.0" />
                </padding>

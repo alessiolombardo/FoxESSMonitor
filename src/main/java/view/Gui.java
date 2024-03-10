@@ -1,12 +1,10 @@
 package view;
 
 import java.io.File;
-import java.security.NoSuchAlgorithmException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -21,7 +19,6 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
-import javafx.scene.control.PasswordField;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
@@ -31,7 +28,6 @@ import javafx.scene.layout.GridPane;
 import javafx.stage.FileChooser;
 
 import controller.Controller;
-import model.FoxEssTimeSpan;
 import model.FoxEssVariables;
 import model.Settings;
 
@@ -45,41 +41,35 @@ public class Gui {
 		this.controller = controller;
 	}
 
-	@FXML
-	private TextField usernameTextField;
+    @FXML
+    private TextField statusTextField;
+
+    @FXML
+    private TextField apiKeyTextField;
+
+    @FXML
+    private TextField inverterSNTextField;
+
+    @FXML
+    private TextField exportFileTextField;
+
+    @FXML
+    private CheckBox appendCheckBox;
+
+    @FXML
+    private DatePicker beginDatePicker;
 
 	@FXML
-	private PasswordField passwordTextField;
+	private ComboBox<Byte> beginHourComboBox;
 
 	@FXML
-	private TextField devideIdTextField;
-
-	@FXML
-	private TextField endpointTextField;
-
-	@FXML
-	private TextField exportFileTextField;
-
-	@FXML
-	private CheckBox appendCheckBox;
-
-	@FXML
-	private DatePicker datePicker;
-
-	@FXML
-	private ComboBox<Byte> hourComboBox;
-
-	@FXML
-	private ComboBox<FoxEssTimeSpan> timeSpanComboBox;
-
+	private ComboBox<Byte> spanHourComboBox;
+	
 	@FXML
 	private TableView<List<String>> monitorTableView;
 
 	@FXML
 	private GridPane variablesGridPane;
-
-	@FXML
-	private TextField statusTextField;
 
 	@FXML
 	void extractData(ActionEvent event) {
@@ -112,28 +102,25 @@ public class Gui {
 	}
 
 	@FXML
-	void setDateAndHour(ActionEvent event) {
-		LocalDate date = datePicker.getValue();
-		settings.setDate(LocalDateTime.of(date.getYear(), date.getMonthValue(), date.getDayOfMonth(),
-				hourComboBox.getValue(), 0));
+	void setBeginDateAndHour(ActionEvent event) {
+		LocalDate date = beginDatePicker.getValue();
+		settings.setBeginDate(LocalDateTime.of(date.getYear(), date.getMonthValue(), date.getDayOfMonth(),
+				beginHourComboBox.getValue(), 0));
+		settings.setSpanHour(spanHourComboBox.getValue());
+		settings.setEndDate();
 	}
-
+	
 	@FXML
-	void setTimeSpan(ActionEvent event) {
-		settings.setTimeSpan(timeSpanComboBox.getValue());
+	void setSpanHour(ActionEvent event) {
+		settings.setSpanHour(spanHourComboBox.getValue());
+		settings.setEndDate();
 	}
 
 	@FXML
 	void saveSettings(ActionEvent event) {
 
-		settings.setEndpoint(endpointTextField.getText());
-		settings.setUsername(usernameTextField.getText());
-		try {
-			settings.setPassword(passwordTextField.getText());
-		} catch (NoSuchAlgorithmException e) {
-			setStatus(e, "Password encryption failed", true);
-		}
-		settings.setDeviceId(devideIdTextField.getText());
+		settings.setApiKey(apiKeyTextField.getText());
+		settings.setInverterSerialNumber(inverterSNTextField.getText());
 
 		controller.saveSettings();
 
@@ -143,10 +130,8 @@ public class Gui {
 
 		settings = controller.loadSettings();
 
-		endpointTextField.setText(settings.getEndpoint());
-		usernameTextField.setText(settings.getUsername());
-		passwordTextField.setText("");
-		devideIdTextField.setText(settings.getDeviceId());
+		apiKeyTextField.setText(settings.getApiKey());
+		inverterSNTextField.setText(settings.getInverterSerialNumber());
 		exportFileTextField.setText(settings.getExportFilename());
 
 		for (FoxEssVariables variables : settings.getVariables().keySet()) {
@@ -162,19 +147,21 @@ public class Gui {
 			variablesGridPane.add(c, (int) (variables.ordinal() / 14), variables.ordinal() % 14);
 		}
 
-		datePicker.setValue(settings.getDate().toLocalDate());
+		beginDatePicker.setValue(settings.getBeginDate().toLocalDate());
 
 		List<Byte> hoursList = new ArrayList<Byte>();
 		for (int i = 0; i < 24; i++) {
 			hoursList.add((byte) i);
 		}
-		hourComboBox.setItems(FXCollections.observableList(hoursList));
-		hourComboBox.getSelectionModel().select(settings.getDate().getHour());
-
-		timeSpanComboBox.setItems(FXCollections.observableList(Arrays.asList(FoxEssTimeSpan.values())));
-		timeSpanComboBox.getSelectionModel().select(settings.getTimeSpan());
-
-		appendCheckBox.setSelected(settings.getAppend());
+		beginHourComboBox.setItems(FXCollections.observableList(hoursList));
+		beginHourComboBox.getSelectionModel().select(settings.getBeginDate().getHour());
+		
+		List<Byte> hoursList2 = new ArrayList<Byte>();
+		for (int i = 1; i <= 24; i++) {
+			hoursList2.add((byte) i);
+		}
+		spanHourComboBox.setItems(FXCollections.observableList(hoursList2));
+		spanHourComboBox.getSelectionModel().select((Byte)settings.getSpanHour());
 
 		updateMonitorColumns();
 
