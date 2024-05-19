@@ -230,7 +230,8 @@ public class Controller extends Application {
 			}
 		}
 
-		gui.setStatus(null, "Data extraction completed successfully", false);
+		gui.setStatus(null, "Data extraction completed successfully [from " + settings.getBeginDate() + " to "
+				+ settings.getEndDate() + "]", false);
 
 		return dataMap;
 

@@ -162,6 +162,8 @@ public class Gui {
 		}
 		spanHourComboBox.setItems(FXCollections.observableList(hoursList2));
 		spanHourComboBox.getSelectionModel().select((Byte)settings.getSpanHour());
+		
+		appendCheckBox.setSelected(settings.getAppend());
 
 		updateMonitorColumns();
 
