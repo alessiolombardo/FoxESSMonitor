@@ -41,30 +41,33 @@ public class Gui {
 		this.controller = controller;
 	}
 
-    @FXML
-    private TextField statusTextField;
+	@FXML
+	private TextField statusTextField;
 
-    @FXML
-    private TextField apiKeyTextField;
+	@FXML
+	private TextField apiKeyTextField;
 
-    @FXML
-    private TextField inverterSNTextField;
+	@FXML
+	private TextField inverterSNTextField;
 
-    @FXML
-    private TextField exportFileTextField;
+	@FXML
+	private TextField exportFileTextField;
 
-    @FXML
-    private CheckBox appendCheckBox;
+	@FXML
+	private CheckBox appendCheckBox;
 
-    @FXML
-    private DatePicker beginDatePicker;
+	@FXML
+	private DatePicker beginDatePicker;
 
 	@FXML
 	private ComboBox<Byte> beginHourComboBox;
 
 	@FXML
 	private ComboBox<Byte> spanHourComboBox;
-	
+
+	@FXML
+	private ComboBox<Byte> spanDayComboBox;
+
 	@FXML
 	private TableView<List<String>> monitorTableView;
 
@@ -74,13 +77,13 @@ public class Gui {
 	@FXML
 	void extractData(ActionEvent event) {
 		saveSettings(null);
-		controller.extractData(false);
+		controller.extractData(spanDayComboBox.getValue() > 0, false);
 	}
 
 	@FXML
 	void exportData(ActionEvent event) {
 		saveSettings(null);
-		controller.extractData(true);
+		controller.extractData(spanDayComboBox.getValue() > 0, true);
 	}
 
 	@FXML
@@ -104,16 +107,29 @@ public class Gui {
 	@FXML
 	void setBeginDateAndHour(ActionEvent event) {
 		LocalDate date = beginDatePicker.getValue();
+		if (spanDayComboBox.getValue() > 0) {
+			beginHourComboBox.setValue((byte) 0);
+		}
 		settings.setBeginDate(LocalDateTime.of(date.getYear(), date.getMonthValue(), date.getDayOfMonth(),
 				beginHourComboBox.getValue(), 0));
-		settings.setSpanHour(spanHourComboBox.getValue());
-		settings.setEndDate();
+		settings.setSpanDay(spanDayComboBox.getValue());
+		settings.setEndDate(spanDayComboBox.getValue() > 0);
 	}
-	
+
+	@FXML
+	void setSpanDay(ActionEvent event) {
+		beginHourComboBox.setDisable(spanDayComboBox.getValue() > 0);
+		beginHourComboBox.setValue((byte) 0);
+		spanHourComboBox.setDisable(spanDayComboBox.getValue() > 0);
+		settings.setSpanDay(spanDayComboBox.getValue());
+		settings.setSpanHour(spanHourComboBox.getValue());
+		settings.setEndDate(spanDayComboBox.getValue() > 0);
+	}
+
 	@FXML
 	void setSpanHour(ActionEvent event) {
 		settings.setSpanHour(spanHourComboBox.getValue());
-		settings.setEndDate();
+		settings.setEndDate(false);
 	}
 
 	@FXML
@@ -149,20 +165,27 @@ public class Gui {
 
 		beginDatePicker.setValue(settings.getBeginDate().toLocalDate());
 
+		List<Byte> dayList = new ArrayList<Byte>();
+		for (int i = 0; i < 32; i++) {
+			dayList.add((byte) i);
+		}
+		spanDayComboBox.setItems(FXCollections.observableList(dayList));
+		spanDayComboBox.getSelectionModel().select(0);
+
 		List<Byte> hoursList = new ArrayList<Byte>();
 		for (int i = 0; i < 24; i++) {
 			hoursList.add((byte) i);
 		}
 		beginHourComboBox.setItems(FXCollections.observableList(hoursList));
 		beginHourComboBox.getSelectionModel().select(settings.getBeginDate().getHour());
-		
+
 		List<Byte> hoursList2 = new ArrayList<Byte>();
 		for (int i = 1; i <= 24; i++) {
 			hoursList2.add((byte) i);
 		}
 		spanHourComboBox.setItems(FXCollections.observableList(hoursList2));
-		spanHourComboBox.getSelectionModel().select((Byte)settings.getSpanHour());
-		
+		spanHourComboBox.getSelectionModel().select((Byte) settings.getSpanHour());
+
 		appendCheckBox.setSelected(settings.getAppend());
 
 		updateMonitorColumns();

@@ -25,6 +25,8 @@ public class Settings {
 
 	private transient byte spanHour;
 
+	private transient byte spanDay;
+
 	private String dateTimeFormat = "dd/MM/yyyy HH:mm";
 
 	private EnumMap<FoxEssVariables, Boolean> variables = new EnumMap<>(FoxEssVariables.class);
@@ -32,7 +34,7 @@ public class Settings {
 	public Settings() {
 		setSpanHour((byte) 1);
 		setBeginDate(LocalDateTime.now());
-		setEndDate();
+		setEndDate(false);
 		for (FoxEssVariables v : Arrays.asList(FoxEssVariables.values())) {
 			variables.put(v, false);
 		}
@@ -98,8 +100,20 @@ public class Settings {
 		return endDate;
 	}
 
-	public void setEndDate() {
-		this.endDate = beginDate.plusHours(getSpanHour());
+	public void setEndDate(boolean isDay) {
+		if (isDay) {
+			this.endDate = beginDate.plusDays(getSpanDay());
+		} else {
+			this.endDate = beginDate.plusHours(getSpanHour());
+		}
+	}
+
+	public byte getSpanDay() {
+		return spanDay;
+	}
+
+	public void setSpanDay(byte spanDay) {
+		this.spanDay = spanDay;
 	}
 
 	public byte getSpanHour() {

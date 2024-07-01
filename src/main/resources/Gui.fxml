@@ -92,6 +92,12 @@
                      </padding>
                   </Label>
                   <ComboBox fx:id="spanHourComboBox" onAction="#setSpanHour" prefHeight="25.0" prefWidth="55.0" />
+                  <Label alignment="CENTER_RIGHT" layoutX="564.0" layoutY="18.0" prefWidth="80.0" text="Span (Day):">
+                     <padding>
+                        <Insets left="10.0" />
+                     </padding>
+                  </Label>
+                  <ComboBox fx:id="spanDayComboBox" layoutX="654.0" layoutY="14.0" onAction="#setSpanDay" prefHeight="25.0" prefWidth="55.0" />
 					</children>
 				</HBox>
 				<TabPane tabClosingPolicy="UNAVAILABLE">
@@ -161,7 +167,7 @@
                   <Insets top="5.0" />
                </VBox.margin>
             </ImageView>
-            <Label text="by Alessio Lombardo - Version 2.0" textFill="#004071">
+            <Label text="by Alessio Lombardo - Version 2.2" textFill="#004071">
                <padding>
                   <Insets bottom="5.0" right="5.0" />
                </padding>

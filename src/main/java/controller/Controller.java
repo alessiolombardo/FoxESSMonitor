@@ -15,6 +15,7 @@ import java.security.cert.X509Certificate;
 import java.security.MessageDigest;
 import java.text.DecimalFormatSymbols;
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -117,31 +118,51 @@ public class Controller extends Application {
 
 	}
 
-	public void extractData(Boolean export) {
+	public void extractData(Boolean isMultipleDayExtraction, Boolean export) {
 
 		try {
-
 			sslTrustInit();
-
-			ResponseData responseData = requestRawData();
-
-			conn.disconnect();
-
-			Map<OffsetDateTime, ArrayList<String>> dataMap = elaborateResponse(responseData);
-			if (dataMap == null) {
-				return;
-			}
-
-			gui.updateMonitowRecord(dataMap);
-
-			if (export) {
-				exportData(dataMap);
-			}
-
 		} catch (KeyManagementException | NoSuchAlgorithmException e) {
 			gui.setStatus(e, "SSL Error", true);
-		} catch (IOException e) {
-			gui.setStatus(e, "Request data error", true);
+		}
+
+		Map<OffsetDateTime, ArrayList<String>> dataMap = new TreeMap<OffsetDateTime, ArrayList<String>>();
+
+		if (!isMultipleDayExtraction) {
+			try {
+				ResponseData responseData = requestRawData(settings.getBeginDate(), settings.getEndDate());
+				elaborateResponse(dataMap, responseData, true);
+			} catch (IOException | NoSuchAlgorithmException e) {
+				gui.setStatus(e, "Request data error (from " + settings.getBeginDate() + " to " + settings.getEndDate(),
+						true);
+			} finally {
+				conn.disconnect();
+			}
+		} else {
+
+			for (LocalDateTime beginDate = settings.getBeginDate(); beginDate
+					.compareTo(settings.getEndDate()) != 0; beginDate = beginDate.plusDays(1)) {
+
+				try {
+					ResponseData responseData = requestRawData(beginDate, beginDate.plusDays(1));
+					int error = elaborateResponse(dataMap, responseData, false);
+					if (error > 0) { // Try again if fail
+						responseData = requestRawData(beginDate, beginDate.plusDays(1));
+						elaborateResponse(dataMap, responseData, true);
+					}
+				} catch (IOException | NoSuchAlgorithmException e) {
+					gui.setStatus(e, "Request data error (from " + beginDate + " to " + beginDate.plusDays(1), true);
+				} finally {
+					conn.disconnect();
+				}
+			}
+
+		}
+
+		gui.updateMonitowRecord(dataMap);
+
+		if (export) {
+			exportData(dataMap);
 		}
 
 	}
@@ -163,7 +184,8 @@ public class Controller extends Application {
 		HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
 	}
 
-	private ResponseData requestRawData() throws IOException, NoSuchAlgorithmException {
+	private ResponseData requestRawData(LocalDateTime beginDate, LocalDateTime endDate)
+			throws IOException, NoSuchAlgorithmException {
 
 		conn = (HttpsURLConnection) new URL(settings.getEndpoint() + settings.getUrnReportQuery()).openConnection();
 		conn.setDoOutput(true);
@@ -187,40 +209,43 @@ public class Controller extends Application {
 			}
 		}
 
-		d.setBegin(settings.getBeginDate().toEpochSecond(OffsetDateTime.now().getOffset()) * 1000);
-		d.setEnd(settings.getEndDate().toEpochSecond(OffsetDateTime.now().getOffset()) * 1000);
+		d.setBegin(beginDate.toEpochSecond(OffsetDateTime.now().getOffset()) * 1000);
+		d.setEnd(endDate.toEpochSecond(OffsetDateTime.now().getOffset()) * 1000);
 
 		conn.getOutputStream().write(new Gson().toJson(d).getBytes());
 
-		String output = new BufferedReader(new InputStreamReader((conn.getInputStream()))).readLine();
+		BufferedReader br = new BufferedReader(new InputStreamReader((conn.getInputStream())));
+		String output = br.readLine();
 		ResponseData responseData = new Gson().fromJson(output, ResponseData.class);
 
 		return responseData;
 
 	}
 
-	public Map<OffsetDateTime, ArrayList<String>> elaborateResponse(ResponseData responseData) {
+	public int elaborateResponse(Map<OffsetDateTime, ArrayList<String>> dataMap, ResponseData responseData,
+			Boolean showAlert) {
 
 		if (responseData.getErrno() == 40256) {
 			gui.setStatus(null, "Error " + responseData.getErrno()
 					+ ": The request header parameters are missing. Please check whether the request headers are consistent with the document requirements.",
-					true);
+					showAlert);
 		} else if (responseData.getErrno() == 40257) {
 			gui.setStatus(null, "Error " + responseData.getErrno()
 					+ ": The request body parameters are invalid. Please check whether the request body is consistent with the document requirements.",
-					true);
+					showAlert);
 		} else if (responseData.getErrno() == 40400) {
-			gui.setStatus(null, "Error " + responseData.getErrno()
-					+ ": The number of requests is too frequent. Please reduce the frequency of access.", true);
+			gui.setStatus(null,
+					"Error " + responseData.getErrno()
+							+ ": The number of requests is too frequent. Please reduce the frequency of access.",
+					showAlert);
 		} else if (responseData.getErrno() > 0) {
-			gui.setStatus(null, "Error " + responseData.getErrno(), true);
+			gui.setStatus(null, "Error " + responseData.getErrno(), showAlert);
 		}
 
 		if (responseData.getErrno() > 0) {
-			return null;
+			return responseData.getErrno();
 		}
 
-		Map<OffsetDateTime, ArrayList<String>> dataMap = new TreeMap<OffsetDateTime, ArrayList<String>>();
 		for (ResponseData.Result.Datas datas : responseData.getResult().get(0).getDatas()) {
 			for (ResponseData.Result.Datas.Data data : datas.getData()) {
 				OffsetDateTime offsetDatetime = OffsetDateTime.parse(data.getTime(),
@@ -233,7 +258,7 @@ public class Controller extends Application {
 		gui.setStatus(null, "Data extraction completed successfully [from " + settings.getBeginDate() + " to "
 				+ settings.getEndDate() + "]", false);
 
-		return dataMap;
+		return 0;
 
 	}
 
