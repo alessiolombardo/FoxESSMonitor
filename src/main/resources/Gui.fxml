@@ -21,7 +21,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane prefHeight="710.0" prefWidth="890.0" xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml/1" fx:controller="view.Gui">
+<BorderPane prefHeight="710.0" prefWidth="890.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="view.Gui">
 	<bottom>
 		<VBox prefHeight="95.0" prefWidth="770.0" BorderPane.alignment="CENTER">
 			<children>
@@ -167,7 +167,7 @@
                   <Insets top="5.0" />
                </VBox.margin>
             </ImageView>
-            <Label text="by Alessio Lombardo - Version 2.2" textFill="#004071">
+            <Label alignment="CENTER" prefHeight="22.0" prefWidth="263.0" text="by Alessio Lombardo - Version 3.0 (04/2025)" textAlignment="CENTER" textFill="#004071">
                <padding>
                   <Insets bottom="5.0" right="5.0" />
                </padding>

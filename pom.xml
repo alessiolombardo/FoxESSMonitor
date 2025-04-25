@@ -1,15 +1,17 @@
-<project xmlns="https://maven.apache.org/POM/4.0.0" xmlns:xsi="https://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="https://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>alessiolombardo</groupId>
 	<artifactId>FoxESSMonitor</artifactId>
-	<version>2.2</version>
+	<version>3.0</version>
 	<name>FoxESSMonitor</name>
 	<description>FoxESSMonitor</description>
 
 
 	<properties>
-		<maven.compiler.source>1.8</maven.compiler.source>
-		<maven.compiler.target>1.8</maven.compiler.target>
+		<maven.compiler.source>21</maven.compiler.source>
+		<maven.compiler.target>21</maven.compiler.target>
 	</properties>
 
 
@@ -37,11 +39,95 @@
 					</execution>
 				</executions>
 			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+				<version>3.4.2</version>
+				<configuration>
+					<archive>
+						<manifest>
+							<addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+							<addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
+						</manifest>
+						<manifestEntries>
+							<Multi-Release>true</Multi-Release>
+						</manifestEntries>
+					</archive>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>com.akathist.maven.plugins.launch4j</groupId>
+				<artifactId>launch4j-maven-plugin</artifactId>
+				<version>2.5.2</version>
+				<executions>
+					<execution>
+						<id>l4j-cli</id>
+						<phase>package</phase>
+						<goals>
+							<goal>launch4j</goal>
+						</goals>
+						<configuration>
+							<headerType>gui</headerType>
+							<outfile>target/FoxESSMonitor.exe</outfile>
+							<classPath>
+								<mainClass>controller.Controller</mainClass>
+							</classPath>
+							<icon>icon.ico</icon>
+							<jre>
+								<!-- <path>${env.JAVA_HOME}\bin</path>-->
+								<minVersion></minVersion>
+								<maxVersion></maxVersion>
+								<initialHeapSize>256</initialHeapSize>
+								<maxHeapSize>1024</maxHeapSize>
+							</jre>
+							<versionInfo>
+								<txtFileVersion>${project.version}</txtFileVersion>
+								<copyright>(C) Alessio Lombardo</copyright>
+								<language>ITALIAN</language>
+							</versionInfo>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
 		</plugins>
 	</build>
 
 
 	<dependencies>
+	
+	<!-- ************************* JAVAFX/GUI ************************* -->
+
+		<!-- https://mvnrepository.com/artifact/org.openjfx/javafx-base -->
+		<dependency>
+			<groupId>org.openjfx</groupId>
+			<artifactId>javafx-base</artifactId>
+			<version>24-ea+15</version>
+			<scope>provided</scope>
+		</dependency>
+
+		<!-- https://mvnrepository.com/artifact/org.openjfx/javafx-graphics -->
+		<dependency>
+			<groupId>org.openjfx</groupId>
+			<artifactId>javafx-graphics</artifactId>
+			<version>24-ea+15</version>
+			<scope>provided</scope>
+		</dependency>
+
+		<!-- https://mvnrepository.com/artifact/org.openjfx/javafx-controls -->
+		<dependency>
+			<groupId>org.openjfx</groupId>
+			<artifactId>javafx-controls</artifactId>
+			<version>24-ea+15</version>
+			<scope>provided</scope>
+		</dependency>
+
+		<!-- https://mvnrepository.com/artifact/org.openjfx/javafx-fxml -->
+		<dependency>
+			<groupId>org.openjfx</groupId>
+			<artifactId>javafx-fxml</artifactId>
+			<version>24-ea+15</version>
+			<scope>provided</scope>
+		</dependency>
 
 		<!-- https://mvnrepository.com/artifact/com.google.code.gson/gson -->
 		<dependency>
@@ -49,14 +135,52 @@
 			<artifactId>gson</artifactId>
 			<version>2.10.1</version>
 		</dependency>
-
-		<!-- https://mvnrepository.com/artifact/de.jensd/fontawesomefx -->
+		
+		<!--
+		https://mvnrepository.com/artifact/de.jensd/fontawesomefx-materialdesignfont -->
 		<dependency>
 			<groupId>de.jensd</groupId>
-			<artifactId>fontawesomefx</artifactId>
-			<version>8.9</version>
+			<artifactId>fontawesomefx-materialdesignfont</artifactId>
+			<version>2.0.26-9.1.2</version>
 		</dependency>
 
+		<!-- https://mvnrepository.com/artifact/de.jensd/fontawesomefx-commons -->
+		<dependency>
+			<groupId>de.jensd</groupId>
+			<artifactId>fontawesomefx-commons</artifactId>
+			<version>9.1.2</version>
+		</dependency>
+
+		<!--
+		https://mvnrepository.com/artifact/de.jensd/fontawesomefx-fontawesome -->
+		<dependency>
+			<groupId>de.jensd</groupId>
+			<artifactId>fontawesomefx-fontawesome</artifactId>
+			<version>4.7.0-9.1.2</version>
+		</dependency>
+
+		<!--
+		https://mvnrepository.com/artifact/de.jensd/fontawesomefx-materialicons -->
+		<dependency>
+			<groupId>de.jensd</groupId>
+			<artifactId>fontawesomefx-materialicons</artifactId>
+			<version>2.2.0-9.1.2</version>
+		</dependency>
+
+		<!-- https://mvnrepository.com/artifact/de.jensd/fontawesomefx-controls -->
+		<dependency>
+			<groupId>de.jensd</groupId>
+			<artifactId>fontawesomefx-controls</artifactId>
+			<version>9.1.2</version>
+		</dependency>
+		
+		<!--
+		https://mvnrepository.com/artifact/com.akathist.maven.plugins.launch4j/launch4j-maven-plugin -->
+		<dependency>
+			<groupId>com.akathist.maven.plugins.launch4j</groupId>
+			<artifactId>launch4j-maven-plugin</artifactId>
+			<version>2.5.3</version>
+		</dependency>
 
 	</dependencies>
 

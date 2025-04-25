@@ -8,7 +8,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.math.BigInteger;
-import java.net.URL;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.X509Certificate;
@@ -132,7 +133,7 @@ public class Controller extends Application {
 			try {
 				ResponseData responseData = requestRawData(settings.getBeginDate(), settings.getEndDate());
 				elaborateResponse(dataMap, responseData, true);
-			} catch (IOException | NoSuchAlgorithmException e) {
+			} catch (IOException | NoSuchAlgorithmException | URISyntaxException e) {
 				gui.setStatus(e, "Request data error (from " + settings.getBeginDate() + " to " + settings.getEndDate(),
 						true);
 			} finally {
@@ -150,7 +151,7 @@ public class Controller extends Application {
 						responseData = requestRawData(beginDate, beginDate.plusDays(1));
 						elaborateResponse(dataMap, responseData, true);
 					}
-				} catch (IOException | NoSuchAlgorithmException e) {
+				} catch (IOException | NoSuchAlgorithmException | URISyntaxException e) {
 					gui.setStatus(e, "Request data error (from " + beginDate + " to " + beginDate.plusDays(1), true);
 				} finally {
 					conn.disconnect();
@@ -185,9 +186,9 @@ public class Controller extends Application {
 	}
 
 	private ResponseData requestRawData(LocalDateTime beginDate, LocalDateTime endDate)
-			throws IOException, NoSuchAlgorithmException {
+			throws IOException, NoSuchAlgorithmException, URISyntaxException {
 
-		conn = (HttpsURLConnection) new URL(settings.getEndpoint() + settings.getUrnReportQuery()).openConnection();
+		conn = (HttpsURLConnection) new URI(settings.getEndpoint() + settings.getUrnReportQuery()).toURL().openConnection();
 		conn.setDoOutput(true);
 
 		String timestamp = "" + Instant.now().toEpochMilli();
