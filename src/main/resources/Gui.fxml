@@ -7,6 +7,7 @@
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.DatePicker?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
 <?import javafx.scene.control.Tab?>
 <?import javafx.scene.control.TabPane?>
 <?import javafx.scene.control.TableView?>
@@ -14,10 +15,7 @@
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.BorderPane?>
-<?import javafx.scene.layout.ColumnConstraints?>
-<?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
@@ -118,34 +116,72 @@
 
 						<Tab text="Variables">
 							<content>
-								<GridPane fx:id="variablesGridPane" prefHeight="373.0" prefWidth="800.0">
-									<columnConstraints>
-										<ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-										<ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-										<ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-										<ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-										<ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-									</columnConstraints>
-									<rowConstraints>
-										<RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-										<RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-										<RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-										<RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-										<RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-										<RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-										<RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-										<RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-										<RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-										<RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-										<RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-										<RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-										<RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-										<RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-									</rowConstraints>
-									<padding>
-										<Insets top="5.0" />
-									</padding>
-								</GridPane>
+                        <HBox>
+                           <children>
+                              <VBox alignment="CENTER">
+                                 <children>
+                                    <Label alignment="CENTER" contentDisplay="CENTER" text="All variables:" textAlignment="CENTER">
+                                       <VBox.margin>
+                                          <Insets bottom="5.0" top="10.0" />
+                                       </VBox.margin>
+                                       <font>
+                                          <Font name="System Bold" size="12.0" />
+                                       </font>
+                                    </Label>
+                                    <ListView fx:id="allVariablesListView" prefHeight="400.0" prefWidth="418.0" />
+                                 </children>
+                              </VBox>
+                              <VBox alignment="CENTER" prefHeight="200.0" prefWidth="150.0">
+                                 <children>
+                                    <Button mnemonicParsing="false" onAction="#addVariableAction" prefWidth="105.0" text="Add">
+                                       <VBox.margin>
+                                          <Insets bottom="5.0" top="25.0" />
+                                       </VBox.margin>
+                                       <graphic>
+                                          <FontAwesomeIconView glyphName="PLUS" size="16" />
+                                       </graphic>
+                                    </Button>
+                                    <Button layoutX="10.0" layoutY="10.0" mnemonicParsing="false" onAction="#removeVariableAction" prefWidth="105.0" text="Remove">
+                                       <VBox.margin>
+                                          <Insets bottom="5.0" top="5.0" />
+                                       </VBox.margin>
+                                       <graphic>
+                                          <FontAwesomeIconView glyphName="TIMES" size="16" />
+                                       </graphic>
+                                    </Button>
+                                    <Button layoutX="18.0" layoutY="192.0" mnemonicParsing="false" onAction="#moveUpVariableAction" prefWidth="105.0" text="Move Up">
+                                       <graphic>
+                                          <FontAwesomeIconView glyphName="ARROW_UP" size="16" />
+                                       </graphic>
+                                       <VBox.margin>
+                                          <Insets bottom="5.0" top="5.0" />
+                                       </VBox.margin>
+                                    </Button>
+                                    <Button layoutX="18.0" layoutY="234.0" mnemonicParsing="false" onAction="#moveDownVariableAction" prefWidth="105.0" text="Move Down">
+                                       <graphic>
+                                          <FontAwesomeIconView glyphName="ARROW_DOWN" size="16" />
+                                       </graphic>
+                                       <VBox.margin>
+                                          <Insets top="5.0" />
+                                       </VBox.margin>
+                                    </Button>
+                                 </children>
+                              </VBox>
+                              <VBox alignment="CENTER" layoutX="10.0" layoutY="10.0">
+                                 <children>
+                                    <Label alignment="CENTER" contentDisplay="CENTER" text="Enabled variables:" textAlignment="CENTER">
+                                       <VBox.margin>
+                                          <Insets bottom="5.0" top="10.0" />
+                                       </VBox.margin>
+                                       <font>
+                                          <Font name="System Bold" size="12.0" />
+                                       </font>
+                                    </Label>
+                                    <ListView fx:id="enabledVariablesListView" prefHeight="400.0" prefWidth="418.0" />
+                                 </children>
+                              </VBox>
+                           </children>
+                        </HBox>
 							</content>
                      <graphic>
                         <FontAwesomeIconView glyphName="SLIDERS" size="14" />
@@ -167,7 +203,7 @@
                   <Insets top="5.0" />
                </VBox.margin>
             </ImageView>
-            <Label alignment="CENTER" prefHeight="22.0" prefWidth="263.0" text="by Alessio Lombardo - Version 3.0 (04/2025)" textAlignment="CENTER" textFill="#004071">
+            <Label alignment="CENTER" prefHeight="22.0" prefWidth="263.0" text="by Alessio Lombardo - Version 4.0 (06/2026)" textAlignment="CENTER" textFill="#004071">
                <padding>
                   <Insets bottom="5.0" right="5.0" />
                </padding>

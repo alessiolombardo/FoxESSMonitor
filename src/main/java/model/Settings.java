@@ -2,8 +2,8 @@ package model;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.Arrays;
-import java.util.EnumMap;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Settings {
 
@@ -29,15 +29,12 @@ public class Settings {
 
 	private String dateTimeFormat = "dd/MM/yyyy HH:mm";
 
-	private EnumMap<FoxEssVariables, Boolean> variables = new EnumMap<>(FoxEssVariables.class);
+	private List<FoxEssVariables> variablesList = new ArrayList<FoxEssVariables>();
 
 	public Settings() {
 		setSpanHour((byte) 1);
 		setBeginDate(LocalDateTime.now());
 		setEndDate(false);
-		for (FoxEssVariables v : Arrays.asList(FoxEssVariables.values())) {
-			variables.put(v, false);
-		}
 	}
 
 	public String getEndpoint() {
@@ -128,20 +125,19 @@ public class Settings {
 		return dateTimeFormat;
 	}
 
-	public EnumMap<FoxEssVariables, Boolean> getVariables() {
-		return variables;
+	public List<FoxEssVariables> getVariablesList() {
+		return variablesList;
 	}
 
-	public void setVariables(EnumMap<FoxEssVariables, Boolean> variables) {
-		this.variables = variables;
+	public void setVariablesList(List<FoxEssVariables> variablesList) {
+		this.variablesList = variablesList;
 	}
 
 	@Override
 	public String toString() {
-		return "Settings [endpoint=" + endpoint + ", urnReportQuery=" + urnReportQuery + ", apiKey=" + apiKey
-				+ ", inverterSerialNumber=" + inverterSerialNumber + ", exportFilename=" + exportFilename + ", append="
-				+ append + ", beginDate=" + beginDate + ", endDate=" + endDate + ", dateTimeFormat=" + dateTimeFormat
-				+ ", variables=" + variables + "]";
+		return "Settings [apiKey=" + apiKey + ", inverterSerialNumber=" + inverterSerialNumber + ", exportFilename="
+				+ exportFilename + ", append=" + append + ", dateTimeFormat=" + dateTimeFormat + ", variablesList="
+				+ variablesList + "]";
 	}
 
 }

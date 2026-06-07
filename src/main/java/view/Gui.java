@@ -10,8 +10,6 @@ import java.util.List;
 import java.util.Map;
 
 import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -19,12 +17,12 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
+import javafx.scene.control.ListView;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.GridPane;
 import javafx.stage.FileChooser;
 
 import controller.Controller;
@@ -72,7 +70,10 @@ public class Gui {
 	private TableView<List<String>> monitorTableView;
 
 	@FXML
-	private GridPane variablesGridPane;
+	private ListView<FoxEssVariables> allVariablesListView;
+
+	@FXML
+	private ListView<FoxEssVariables> enabledVariablesListView;
 
 	@FXML
 	void extractData(ActionEvent event) {
@@ -150,18 +151,9 @@ public class Gui {
 		inverterSNTextField.setText(settings.getInverterSerialNumber());
 		exportFileTextField.setText(settings.getExportFilename());
 
-		for (FoxEssVariables variables : settings.getVariables().keySet()) {
-			CheckBox c = new CheckBox(variables.name());
-			c.setSelected(settings.getVariables().get(variables));
-			c.selectedProperty().addListener(new ChangeListener<Boolean>() {
-				@Override
-				public void changed(ObservableValue<? extends Boolean> v, Boolean oldValue, Boolean newValue) {
-					settings.getVariables().put(variables, newValue);
-					updateMonitorColumns();
-				}
-			});
-			variablesGridPane.add(c, (int) (variables.ordinal() / 14), variables.ordinal() % 14);
-		}
+		allVariablesListView.getItems().addAll(FoxEssVariables.values());
+
+		enabledVariablesListView.getItems().addAll(settings.getVariablesList());
 
 		beginDatePicker.setValue(settings.getBeginDate().toLocalDate());
 
@@ -201,21 +193,19 @@ public class Gui {
 		timestampColumn.setCellValueFactory(col -> new SimpleStringProperty(col.getValue().get(0).toString()));
 		monitorTableView.getColumns().add(timestampColumn);
 
-		for (Map.Entry<FoxEssVariables, Boolean> entry : settings.getVariables().entrySet()) {
-			if (entry.getValue().equals(true)) {
-				TableColumn<List<String>, String> variableColumn = new TableColumn<>(entry.getKey().name());
-				int columnIndex = monitorTableView.getColumns().size();
-				variableColumn.setCellValueFactory(
-						col -> new SimpleStringProperty(col.getValue().get(columnIndex).toString()));
-				monitorTableView.getColumns().add(variableColumn);
-			}
+		for (FoxEssVariables variable : settings.getVariablesList()) {
+			TableColumn<List<String>, String> variableColumn = new TableColumn<>(variable.name());
+			int columnIndex = monitorTableView.getColumns().size();
+			variableColumn
+					.setCellValueFactory(col -> new SimpleStringProperty(col.getValue().get(columnIndex).toString()));
+			monitorTableView.getColumns().add(variableColumn);
 		}
 
-		monitorTableView.getItems().add(Collections.nCopies(settings.getVariables().entrySet().size() + 1, ""));
+		monitorTableView.getItems().add(Collections.nCopies(settings.getVariablesList().size() + 1, ""));
 
 	}
 
-	public void updateMonitowRecord(Map<OffsetDateTime, ArrayList<String>> dataMap) {
+	public void updateMonitorRecord(Map<OffsetDateTime, ArrayList<String>> dataMap) {
 
 		monitorTableView.getItems().clear();
 
@@ -240,6 +230,44 @@ public class Gui {
 			alert.setContentText(status);
 			alert.show();
 		}
+	}
+
+	@FXML
+	void addVariableAction(ActionEvent event) {
+		controller.enabledVariablesListControl(allVariablesListView.getSelectionModel().getSelectedItem(), 'a');
+		enabledVariablesListView.getItems().clear();
+		enabledVariablesListView.getItems().addAll(settings.getVariablesList());
+		updateMonitorColumns();
+	}
+
+	@FXML
+	void removeVariableAction(ActionEvent event) {
+		controller.enabledVariablesListControl(enabledVariablesListView.getSelectionModel().getSelectedItem(), 'r');
+		enabledVariablesListView.getItems().clear();
+		enabledVariablesListView.getItems().addAll(settings.getVariablesList());
+		updateMonitorColumns();
+	}
+
+	@FXML
+	void moveUpVariableAction(ActionEvent event) {
+		FoxEssVariables selectedVariable = enabledVariablesListView.getSelectionModel().getSelectedItem();
+		controller.enabledVariablesListControl(selectedVariable, 'u');
+		enabledVariablesListView.getItems().clear();
+		enabledVariablesListView.getItems().addAll(settings.getVariablesList());
+		enabledVariablesListView.getSelectionModel().select(selectedVariable);
+		enabledVariablesListView.requestFocus();
+		updateMonitorColumns();
+	}
+
+	@FXML
+	void moveDownVariableAction(ActionEvent event) {
+		FoxEssVariables selectedVariable = enabledVariablesListView.getSelectionModel().getSelectedItem();
+		controller.enabledVariablesListControl(selectedVariable, 'd');
+		enabledVariablesListView.getItems().clear();
+		enabledVariablesListView.getItems().addAll(settings.getVariablesList());
+		enabledVariablesListView.getSelectionModel().select(selectedVariable);
+		enabledVariablesListView.requestFocus();
+		updateMonitorColumns();
 	}
 
 }

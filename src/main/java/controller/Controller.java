@@ -20,6 +20,8 @@ import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -160,7 +162,7 @@ public class Controller extends Application {
 
 		}
 
-		gui.updateMonitowRecord(dataMap);
+		gui.updateMonitorRecord(dataMap);
 
 		if (export) {
 			exportData(dataMap);
@@ -188,7 +190,8 @@ public class Controller extends Application {
 	private ResponseData requestRawData(LocalDateTime beginDate, LocalDateTime endDate)
 			throws IOException, NoSuchAlgorithmException, URISyntaxException {
 
-		conn = (HttpsURLConnection) new URI(settings.getEndpoint() + settings.getUrnReportQuery()).toURL().openConnection();
+		conn = (HttpsURLConnection) new URI(settings.getEndpoint() + settings.getUrnReportQuery()).toURL()
+				.openConnection();
 		conn.setDoOutput(true);
 
 		String timestamp = "" + Instant.now().toEpochMilli();
@@ -204,10 +207,9 @@ public class Controller extends Application {
 
 		RequestData d = new RequestData();
 		d.setSn(settings.getInverterSerialNumber());
-		for (Map.Entry<FoxEssVariables, Boolean> entry : settings.getVariables().entrySet()) {
-			if (entry.getValue().equals(true)) {
-				d.getVariables().add(entry.getKey());
-			}
+
+		for (FoxEssVariables variable : settings.getVariablesList()) {
+			d.getVariables().add(variable);
 		}
 
 		d.setBegin(beginDate.toEpochSecond(OffsetDateTime.now().getOffset()) * 1000);
@@ -281,11 +283,11 @@ public class Controller extends Application {
 
 			FileWriter fileWriter = new FileWriter(settings.getExportFilename(), settings.getAppend());
 			StringBuilder header = new StringBuilder("Timestamp");
-			for (Map.Entry<FoxEssVariables, Boolean> entry : settings.getVariables().entrySet()) {
-				if (entry.getValue().equals(true)) {
-					header.append(";" + entry.getKey());
-				}
+
+			for (FoxEssVariables variable : settings.getVariablesList()) {
+				header.append(";" + variable);
 			}
+
 			if (new File(settings.getExportFilename()).length() == 0 || !lastFileHeader.equals(header.toString())) {
 				fileWriter.write(header.toString() + "\n");
 				fileWriter.flush();
@@ -304,6 +306,29 @@ public class Controller extends Application {
 		} catch (IOException e) {
 			gui.setStatus(e, "Error to save CSV file", true);
 		}
+
+	}
+
+	public List<FoxEssVariables> enabledVariablesListControl(FoxEssVariables e, char action) {
+
+		List<FoxEssVariables> variablesList = settings.getVariablesList();
+
+		if (e == null) {
+			return variablesList;
+		}
+
+		if (action == 'a') {
+			variablesList.remove(e);
+			variablesList.add(e);
+		} else if (action == 'r') {
+			variablesList.remove(e);
+		} else if (action == 'u' && variablesList.indexOf(e) > 0) {
+			Collections.swap(variablesList, variablesList.indexOf(e), variablesList.indexOf(e) - 1);
+		} else if (action == 'd' && variablesList.indexOf(e) < variablesList.size() - 1) {
+			Collections.swap(variablesList, variablesList.indexOf(e), variablesList.indexOf(e) + 1);
+		}
+
+		return variablesList;
 
 	}
 
